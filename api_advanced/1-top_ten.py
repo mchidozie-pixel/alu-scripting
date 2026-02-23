@@ -1,20 +1,30 @@
 #!/usr/bin/python3
-"""" Top Ten Limit"""
+"""Fetch and print top 10 hot posts"""
 import requests
 
 
 def top_ten(subreddit):
-    """"top ten"""
-    url = "https://www.reddit.com/r/{}/hot.json?limit=10" \
-        . format(subreddit)
+    """Print titles of first 10 hot posts"""
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
 
-    res = requests.get(url,
-                       headers={
-                           'User-Agent': 'Mozilla/5.0'})
+    headers = {
+        "User-Agent": "python:alu.reddit.api:v1.0 (by /u/anonymous)"
+    }
+
+    params = {"limit": 10}
+
+    res = requests.get(url, headers=headers, params=params, allow_redirects=False)
 
     if res.status_code != 200:
         print(None)
-    else:
-        json_response = res.json()
-        posts = json_response.get('data').get('children')
-        [print(post.get('data').get('title')) for post in posts]
+        return
+
+    posts = res.json().get("data", {}).get("children", [])
+
+    if not posts:
+        print(None)
+        return
+
+    for post in posts:
+        print(post.get("data").get("title"))
+
