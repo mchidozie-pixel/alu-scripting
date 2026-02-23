@@ -1,36 +1,40 @@
 #!/usr/bin/python3
 """
-Queries the Reddit API and prints the titles of the first 
-10 hot posts listed for a given subreddit.
+This module provides a function that interacts with the Reddit API.
+It retrieves and prints the titles of the first 10 hot posts for
+a specified subreddit.
 """
 import requests
 
 
 def top_ten(subreddit):
     """
-    Prints the titles of the top 10 hot posts for a given subreddit.
-    If the subreddit is invalid, prints None.
+    Queries the Reddit API and prints the titles of the first 10 hot posts.
+
+    Args:
+        subreddit (str): The name of the subreddit to query.
+
+    If the subreddit is invalid or an error occurs, the function prints None.
     """
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
+    # Custom User-Agent to avoid generic bot blocking (Reddit API requirement)
     headers = {
-        "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/your_username)"
+        'User-Agent': 'python:api.advanced:v1.0.0 (by /u/wintermancer)'
     }
-    params = {"limit": 10}
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    params = {'limit': 10}
 
     try:
-        response = requests.get(
-            url,
-            headers=headers,
-            params=params,
-            allow_redirects=False
-        )
+        # allow_redirects=False ensures we don't follow 302s to search results
+        response = requests.get(url, headers=headers, params=params,
+                                allow_redirects=False)
 
-        # If the status code is 200, the subreddit exists and is accessible
         if response.status_code == 200:
-            data = response.json().get("data", {})
-            children = data.get("children", [])
-            for post in children:
-                print(post.get("data", {}).get("title"))
+            posts = response.json().get('data', {}).get('children', [])
+            if not posts:
+                print(None)
+                return
+            for post in posts:
+                print(post.get('data', {}).get('title'))
         else:
             print(None)
     except Exception:
