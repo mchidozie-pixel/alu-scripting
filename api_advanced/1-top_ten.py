@@ -5,21 +5,27 @@ import requests
 
 
 def top_ten(subreddit):
-    """Main function"""
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    """Fetch and print titles"""
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
 
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {
+        "User-Agent": "python:alu.project:v1.0 (by /u/anonymous)"
+    }
+
     params = {"limit": 10}
 
     try:
-        response = requests.get(url, headers=headers,
-                                params=params, allow_redirects=False)
+        res = requests.get(url,
+                           headers=headers,
+                           params=params,
+                           allow_redirects=False,
+                           timeout=10)
 
-        if response.status_code != 200:
+        if res.status_code != 200:
             print(None)
             return
 
-        posts = response.json().get("data", {}).get("children", [])
+        posts = res.json().get("data", {}).get("children", [])
 
         if not posts:
             print(None)
